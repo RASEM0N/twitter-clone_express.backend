@@ -3,6 +3,7 @@
     "@types/express": "^4.17.11",
     "@types/mongoose": "^5.10.5",
     "@types/morgan": "^1.9.2",
+    "dotenv": "^9.0.0",
     "express": "^4.17.1",
     "express-validator": "^6.10.1",
     "mongoose": "^5.12.7",

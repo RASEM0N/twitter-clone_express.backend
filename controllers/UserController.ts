@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import UserModel from '../models/UserModel'
 import { validationResult } from 'express-validator'
+import { generateMD5 } from '../utils/generateHash'
 
 class UserController {
     index = async (_: Request, res: Response): Promise<void> => {
@@ -9,7 +10,7 @@ class UserController {
 
             res.json({
                 status: 'success',
-                data: users,
+                data: users
             })
 
         } catch (error) {
@@ -37,13 +38,14 @@ class UserController {
                 username: req.body.username,
                 fullname: req.body.fullname,
                 password: req.body.password,
+                confirm_hash: generateMD5(process.env.SECRET_HASH_KEY),
             }
 
             const user = await UserModel.create(data)
 
             res.json({
                 status: 'success',
-                data: user
+                data: user,
             })
 
         } catch (error) {

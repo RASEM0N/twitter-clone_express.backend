@@ -6,6 +6,7 @@ async function connectDB() {
         useCreateIndex: true,
         useUnifiedTopology: true,
         useFindAndModify: true,
+        dbName: 'TwitterClone'
     })
 
     console.log(`MongoDb connected: ${conn.connection.host}`)
