@@ -1,8 +1,8 @@
-import * as validator from 'express-validator'
+import { body } from 'express-validator'
 
 const registerValidation = [
     // email
-    validator.body('email', 'Электронная почта')
+    body('email', 'Электронная почта')
         .isString()
         .isEmail()
         .isLength({
@@ -12,7 +12,7 @@ const registerValidation = [
         .withMessage('Допустимое кол-во символов в почте от 10 до 40'),
 
     // username
-    validator.body('username', 'Логин')
+    body('username', 'Логин')
         .isString()
         .isLength({
             min: 4,
@@ -21,7 +21,7 @@ const registerValidation = [
         .withMessage('Допустимое кол-во символов от 4 до 24'),
 
     // fullname
-    validator.body('fullname', 'Имя пользователя')
+    body('fullname', 'Имя пользователя')
         .isString()
         .isLength({
             min: 4,
@@ -30,7 +30,7 @@ const registerValidation = [
         .withMessage('Допустимое кол-во символов от 4 до 24'),
 
     // password
-    validator.body('password', 'Пароль')
+    body('password', 'Пароль')
         .isString()
         .isLength({
             min: 6,
