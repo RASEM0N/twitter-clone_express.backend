@@ -12,21 +12,18 @@ connectDB()
 const app = express()
 
 // --- MIDDLEWARE ---
-app.use(express.json())
 app.use(morgan('dev'))
+app.use(express.json())
 
 app.get('/users', userController.index)
-app.post('/users', registerValidation, userController.index)
+app.post('/users', registerValidation, userController.create)
 
-const PORT = process.env.PORT
-
+const PORT = process.env.PORT || 5000
 const server = app.listen(PORT, () => {
     console.log(`SERVER RUNNING on the port ${PORT}`)
 })
 
 process.on('unhandledRejection', (err, promise) => {
-    console.log(`---- Error ----`)
     console.log(err)
-
     server.close(() => process.exit(1))
 })

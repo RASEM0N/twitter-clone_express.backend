@@ -21,7 +21,7 @@ class UserController {
         } catch (error) {
             res.json({
                 status: 'error',
-                errors: JSON.stringify(error),
+                errors: error.message,
             })
         }
     }
@@ -35,36 +35,35 @@ class UserController {
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req)
-
-            if (errors) {
+            if (!errors.isEmpty()) {
                 res.status(400).json({
                     status: 'error',
                     errors: errors.array(),
                 })
+                return
             }
 
             const { email, username, fullname, password } = req.body
-            const confirm_hash = generateMD5(process.env.SECRET_HASH_KEY)
-
-            const data = { email, username, fullname, password, confirm_hash }
+            const confirmed_hash = generateMD5(process.env.SECRET_HASH_KEY)
+            const data = { email, username, fullname, password, confirmed_hash }
 
             const user = await UserModel.create(data)
-
-            res.json({
-                status: 'success',
-                data: user,
-            })
 
             await sendEmail({
                 email: email,
                 subject: 'Потверждение почты',
                 message: `Для того, чтобы потвердить почту перейдите 
-                          http://localhost:5003/singup/verify?hash=${confirm_hash}`,
+                          http://localhost:5003/singup/verify?hash=${confirmed_hash}`,
+            })
+
+            res.json({
+                status: 'success',
+                data: user,
             })
         } catch (error) {
             res.json({
                 status: 'error',
-                message: JSON.stringify(error),
+                message: error.message,
             })
         }
     }

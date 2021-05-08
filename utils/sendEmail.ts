@@ -26,7 +26,7 @@ const sendEmail = async (options: MessageOptions): Promise<void> => {
     }
 
     const info = await transport.sendMail(message)
-    console.log(`Message sent: ${info.message}`)
+    console.log(`Message send to ${info.email}`)
 }
 
 export default sendEmail
