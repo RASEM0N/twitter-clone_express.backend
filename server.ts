@@ -17,6 +17,7 @@ app.use(express.json())
 
 app.get('/users', userController.index)
 app.post('/users', registerValidation, userController.create)
+app.get('/verify/:hash', registerValidation, userController.verify)
 
 const PORT = process.env.PORT || 5000
 const server = app.listen(PORT, () => {

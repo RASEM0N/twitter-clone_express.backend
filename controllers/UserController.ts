@@ -19,7 +19,7 @@ class UserController {
                 data: users,
             })
         } catch (error) {
-            res.json({
+            res.status(500).json({
                 status: 'error',
                 errors: error.message,
             })
@@ -53,7 +53,7 @@ class UserController {
                 email: email,
                 subject: 'Потверждение почты',
                 message: `Для того, чтобы потвердить почту перейдите 
-                          http://localhost:5003/singup/verify?hash=${confirmed_hash}`,
+                          http://localhost:5003/verify/${confirmed_hash}`,
             })
 
             res.json({
@@ -61,7 +61,54 @@ class UserController {
                 data: user,
             })
         } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: error.message,
+            })
+        }
+    }
+
+    /**
+     * Verify user
+     * @access      Public
+     * @route       PUT /verify/:hash
+     * @params      hash
+     */
+    verify = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const hash = req.params.hash
+
+            if (!hash) {
+                res.json({
+                    status: 'error',
+                    message: 'please use with a hash',
+                })
+                return
+            }
+
+            const user = await UserModel.findOne({
+                confirmed_hash: hash,
+            })
+
+
+            if (!user) {
+                res.json({
+                    status: 'error',
+                    message: 'user not found',
+                })
+                return
+            }
+
+            await user.update({
+                confirmed: true
+            })
+
             res.json({
+                status: 'success',
+                message: 'User confirmed',
+            })
+        } catch (error) {
+            res.status(500).json({
                 status: 'error',
                 message: error.message,
             })
@@ -69,5 +116,4 @@ class UserController {
     }
 }
 
-const userController = new UserController()
-export default userController
+export default new UserController()
