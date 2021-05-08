@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import UserModel from '../models/UserModel'
 import { validationResult } from 'express-validator'
 import { generateMD5 } from '../utils/generateHash'
+import sendEmail from '../utils/sendEmail'
 
 class UserController {
     /**
@@ -17,7 +18,6 @@ class UserController {
                 status: 'success',
                 data: users,
             })
-
         } catch (error) {
             res.json({
                 status: 'error',
@@ -43,13 +43,10 @@ class UserController {
                 })
             }
 
-            const data = {
-                email: req.body.email,
-                username: req.body.username,
-                fullname: req.body.fullname,
-                password: req.body.password,
-                confirm_hash: generateMD5(process.env.SECRET_HASH_KEY),
-            }
+            const { email, username, fullname, password } = req.body
+            const confirm_hash = generateMD5(process.env.SECRET_HASH_KEY)
+
+            const data = { email, username, fullname, password, confirm_hash }
 
             const user = await UserModel.create(data)
 
@@ -58,6 +55,12 @@ class UserController {
                 data: user,
             })
 
+            await sendEmail({
+                email: email,
+                subject: 'Потверждение почты',
+                message: `Для того, чтобы потвердить почту перейдите 
+                          http://localhost:5003/singup/verify?hash=${confirm_hash}`,
+            })
         } catch (error) {
             res.json({
                 status: 'error',
@@ -67,4 +70,5 @@ class UserController {
     }
 }
 
-export const userController = new UserController()
+const userController = new UserController()
+export default userController
