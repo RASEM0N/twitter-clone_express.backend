@@ -6,7 +6,7 @@ import { userController } from './controllers/UserController'
 import registerValidation from './validation/register'
 import connectDB from './core/db'
 
-dotenv.config({ path: './.env' })
+dotenv.config({ path: './.env.dev' })
 connectDB()
 
 const app = express()
