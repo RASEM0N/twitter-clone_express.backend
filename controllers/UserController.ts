@@ -4,13 +4,18 @@ import { validationResult } from 'express-validator'
 import { generateMD5 } from '../utils/generateHash'
 
 class UserController {
+    /**
+     * Test
+     * @route       GET /users
+     * @access      Public
+     */
     index = async (_: Request, res: Response): Promise<void> => {
         try {
             const users = await UserModel.find().exec()
 
             res.json({
                 status: 'success',
-                data: users
+                data: users,
             })
 
         } catch (error) {
@@ -21,7 +26,12 @@ class UserController {
         }
     }
 
-
+    /**
+     * Create new user
+     * @route       POST /users
+     * @access      Public
+     * @body        email, username, fullname, password & password2
+     */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const errors = validationResult(req)
