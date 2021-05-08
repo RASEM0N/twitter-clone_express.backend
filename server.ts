@@ -2,7 +2,7 @@ import * as express from 'express'
 import * as morgan from 'morgan'
 import * as dotenv from 'dotenv'
 
-import { userController } from './controllers/UserController'
+import userController from './controllers/UserController'
 import registerValidation from './validation/register'
 import connectDB from './core/db'
 

@@ -32,6 +32,5 @@ const UserSchema = new Schema({
     website: String,
 })
 
-
 const UserModel = model('User', UserSchema)
 export default UserModel
