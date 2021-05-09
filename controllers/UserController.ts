@@ -1,11 +1,12 @@
 import { Request, Response } from 'express'
-import UserModel from '../models/UserModel'
+import UserModel, { UserModelInterface } from '../models/UserModel'
 import { validationResult } from 'express-validator'
 import { generateMD5 } from '../utils/generateHash'
 import sendEmail from '../utils/sendEmail'
+import { isValidObjectId } from 'mongoose'
+import { createTokenByUserId } from '../utils/jwt'
 
 class UserController {
-
     /**
      * Get users
      * @route       GET /users
@@ -37,12 +38,20 @@ class UserController {
         try {
             const userId = req.params.userId
 
-            const user = await UserModel.findById(userId).exec()
-
-            if (!user){
+            if (!isValidObjectId(userId)) {
                 res.json({
                     status: 'error',
-                    message: 'user not found'
+                    message: 'invalid user id',
+                })
+                return
+            }
+
+            const user = await UserModel.findById(userId).exec()
+
+            if (!user) {
+                res.json({
+                    status: 'error',
+                    message: 'user not found',
                 })
                 return
             }
@@ -55,6 +64,26 @@ class UserController {
             res.status(500).json({
                 status: 'error',
                 message: error.message,
+            })
+        }
+    }
+
+    /**
+     * Get me
+     * @route       GET /users/me
+     * @params      userid
+     * @access      Private (Middleware [Bearer token])
+     */
+    getMe = async (req: Request, res: Response): Promise<void> => {
+        try {
+            res.json({
+                status: 'success',
+                data: req.user,
+            })
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                data: error.messages,
             })
         }
     }
@@ -76,8 +105,9 @@ class UserController {
                 return
             }
 
-            const { email, username, fullname, password } = req.body
+            let { email, username, fullname, password } = req.body
             const confirmed_hash = generateMD5(process.env.SECRET_HASH_KEY)
+            password = generateMD5(password + process.env.SECRET_HASH_KEY)
             const data = { email, username, fullname, password, confirmed_hash }
 
             const user = await UserModel.create(data)
@@ -123,7 +153,6 @@ class UserController {
                 confirmed_hash: hash,
             })
 
-
             if (!user) {
                 res.json({
                     status: 'error',
@@ -133,7 +162,7 @@ class UserController {
             }
 
             await user.update({
-                confirmed: true
+                confirmed: true,
             })
 
             res.json({
@@ -148,6 +177,27 @@ class UserController {
         }
     }
 
+    /**
+     * Login
+     * @access      Private (Middleware[body: username & password])
+     * @route       GET /auth/login
+     */
+    login = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = req.user as UserModelInterface
+
+            res.json({
+                status: 'success',
+                data: user,
+                token: createTokenByUserId(user._id),
+            })
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: error.message,
+            })
+        }
+    }
 }
 
 export default new UserController()

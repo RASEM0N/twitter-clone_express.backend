@@ -1,6 +1,7 @@
 import { Document, model, Schema } from 'mongoose'
 
-interface UserModelInterface {
+export interface UserModelInterface {
+    _id?: string
     email: string
     username: string
     fullname: string
@@ -34,6 +35,7 @@ const UserSchema = new Schema<UserModelDocumentInterface>({
     password: {
         required: true,
         type: String,
+        select: false,
     },
     confirmed: {
         type: Boolean,
@@ -42,10 +44,20 @@ const UserSchema = new Schema<UserModelDocumentInterface>({
     confirmed_hash: {
         required: true,
         type: String,
+        select: false,
     },
     about: String,
     website: String,
 })
+
+UserSchema.set('toJSON', {
+    transform: (_, ret) => {
+        delete ret.password
+        delete ret.confirmed_hash
+        return ret
+    },
+})
+
 
 const UserModel = model<UserModelDocumentInterface>('User', UserSchema)
 export default UserModel
