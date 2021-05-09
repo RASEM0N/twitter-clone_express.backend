@@ -15,9 +15,10 @@ const app = express()
 app.use(morgan('dev'))
 app.use(express.json())
 
-app.get('/users', userController.index)
-app.post('/users', registerValidation, userController.create)
-app.get('/verify/:hash', registerValidation, userController.verify)
+app.get('/users', userController.getAll)
+app.get('/users/:userId', userController.getById)
+app.post('/auth/register', registerValidation, userController.create)
+app.get('/auth/verify/:hash', userController.verify)
 
 const PORT = process.env.PORT || 5000
 const server = app.listen(PORT, () => {

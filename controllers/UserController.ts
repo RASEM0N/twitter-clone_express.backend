@@ -5,12 +5,13 @@ import { generateMD5 } from '../utils/generateHash'
 import sendEmail from '../utils/sendEmail'
 
 class UserController {
+
     /**
-     * Test
+     * Get users
      * @route       GET /users
      * @access      Public
      */
-    index = async (_: Request, res: Response): Promise<void> => {
+    getAll = async (_: Request, res: Response): Promise<void> => {
         try {
             const users = await UserModel.find().exec()
 
@@ -27,8 +28,40 @@ class UserController {
     }
 
     /**
+     * Get user by id
+     * @route       GET /users/:userId
+     * @params      userid
+     * @access      Public
+     */
+    getById = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const userId = req.params.userId
+
+            const user = await UserModel.findById(userId).exec()
+
+            if (!user){
+                res.json({
+                    status: 'error',
+                    message: 'user not found'
+                })
+                return
+            }
+
+            res.json({
+                status: 'success',
+                data: user,
+            })
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: error.message,
+            })
+        }
+    }
+
+    /**
      * Create new user
-     * @route       POST /users
+     * @route       POST /auth/register
      * @access      Public
      * @body        email, username, fullname, password & password2
      */
@@ -38,7 +71,7 @@ class UserController {
             if (!errors.isEmpty()) {
                 res.status(400).json({
                     status: 'error',
-                    errors: errors.array(),
+                    message: errors.array(),
                 })
                 return
             }
@@ -71,7 +104,7 @@ class UserController {
     /**
      * Verify user
      * @access      Public
-     * @route       PUT /verify/:hash
+     * @route       PUT /auth/verify/:hash
      * @params      hash
      */
     verify = async (req: Request, res: Response): Promise<void> => {
@@ -114,6 +147,7 @@ class UserController {
             })
         }
     }
+
 }
 
 export default new UserController()
