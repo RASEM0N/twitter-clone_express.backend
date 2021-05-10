@@ -18,14 +18,20 @@ app.use(morgan('dev'))
 app.use(express.json())
 app.use(passport.initialize())
 
+// --- USER ROUTES --- //
 app.get('/users', userController.getAll)
 app.get('/users/me', passport.authenticate('jwt'),  userController.getMe)
 app.get('/users/:userId', userController.getById)
 
+// --- AUTHORIZATION ROUTES ---
 app.post('/auth/register', registerValidation, userController.create)
 app.get('/auth/login', passport.authenticate('local'), userController.login)
 app.get('/auth/verify/:hash', userController.verify)
 
+// --- TWEET ROUTES ---
+
+
+// --- SETTINGS ---
 const PORT = process.env.PORT || 5000
 const server = app.listen(PORT, () => {
     console.log(`SERVER RUNNING on the port ${PORT}`)
