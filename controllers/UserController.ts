@@ -184,12 +184,11 @@ class UserController {
      */
     login = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = req.user as UserModelInterface
-
+            const _id = (req.user as UserModelInterface)._id
             res.json({
                 status: 'success',
-                data: user,
-                token: createTokenByUserId(user._id),
+                data: req.user,
+                token: createTokenByUserId(_id),
             })
         } catch (error) {
             res.status(500).json({

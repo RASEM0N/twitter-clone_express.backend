@@ -1,11 +1,13 @@
 import * as express from 'express'
 import * as morgan from 'morgan'
 import * as dotenv from 'dotenv'
+
 dotenv.config({ path: './.env.dev' })
 
-
 import userController from './controllers/UserController'
+import tweetController from './controllers/TweetController'
 import registerValidation from './validation/register'
+import tweetValidation from './validation/tweet'
 import connectDB from './core/db'
 import { passport } from './middleware/passport'
 
@@ -20,7 +22,7 @@ app.use(passport.initialize())
 
 // --- USER ROUTES --- //
 app.get('/users', userController.getAll)
-app.get('/users/me', passport.authenticate('jwt'),  userController.getMe)
+app.get('/users/me', passport.authenticate('jwt'), userController.getMe)
 app.get('/users/:userId', userController.getById)
 
 // --- AUTHORIZATION ROUTES ---
@@ -29,7 +31,10 @@ app.get('/auth/login', passport.authenticate('local'), userController.login)
 app.get('/auth/verify/:hash', userController.verify)
 
 // --- TWEET ROUTES ---
-
+app.post('/tweets', tweetValidation, passport.authenticate('jwt'), tweetController.create)
+app.delete('/tweets/:tweetId', passport.authenticate('jwt'), tweetController.delete)
+app.get('/tweets', tweetController.getAll)
+app.get('/tweets/:tweetId', tweetController.getById)
 
 // --- SETTINGS ---
 const PORT = process.env.PORT || 5000
