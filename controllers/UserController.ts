@@ -106,7 +106,7 @@ class UserController {
             }
 
             let { email, username, fullname, password } = req.body
-            const confirmed_hash = generateMD5(process.env.SECRET_HASH_KEY)
+            const confirmed_hash = generateMD5(email + process.env.SECRET_HASH_KEY)
             password = generateMD5(password + process.env.SECRET_HASH_KEY)
             const data = { email, username, fullname, password, confirmed_hash }
 
@@ -116,7 +116,7 @@ class UserController {
                 email: email,
                 subject: 'Потверждение почты',
                 message: `Для того, чтобы потвердить почту перейдите 
-                          http://localhost:5003/verify/${confirmed_hash}`,
+                          http://localhost:5003/auth/verify/${confirmed_hash}`,
             })
 
             res.json({
