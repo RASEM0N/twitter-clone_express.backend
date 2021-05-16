@@ -22,17 +22,18 @@ app.use(passport.initialize())
 
 // --- USER ROUTES --- //
 app.get('/users', userController.getAll)
-app.get('/users/me', passport.authenticate('jwt'), userController.getMe)
 app.get('/users/:userId', userController.getById)
 
 // --- AUTHORIZATION ROUTES ---
+app.get('/auth/me', passport.authenticate('jwt'), userController.getMe)
 app.post('/auth/register', registerValidation, userController.create)
-app.get('/auth/login', passport.authenticate('local'), userController.login)
+app.post('/auth/login', passport.authenticate('local'), userController.login)
 app.get('/auth/verify/:hash', userController.verify)
 
 // --- TWEET ROUTES ---
-app.post('/tweets', tweetValidation, passport.authenticate('jwt'), tweetController.create)
+app.post('/tweets', passport.authenticate('jwt'), tweetValidation, tweetController.create)
 app.delete('/tweets/:tweetId', passport.authenticate('jwt'), tweetController.delete)
+app.put('/tweets/:tweetId', passport.authenticate('jwt'), tweetValidation, tweetController.update)
 app.get('/tweets', tweetController.getAll)
 app.get('/tweets/:tweetId', tweetController.getById)
 

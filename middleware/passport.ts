@@ -10,8 +10,6 @@ const invalidUserResponse = {
     message: 'Invalid username or password',
 }
 
-
-
 passport.use(
     new LocalStrategy(
         async (username, password, done): Promise<void> => {
@@ -23,17 +21,17 @@ passport.use(
                     .exec()
 
                 if (!user) {
-                    done(null, false)
+                    done(null, false, { message: 'Incorrect password.' })
                     return
                 }
 
                 if (user.password !== generateMD5(password + process.env.SECRET_HASH_KEY)) {
-                    return done(null, false)
+                    return done(null, false, { message: 'Incorrect password.' })
                 }
 
                 done(null, user)
             } catch (error) {
-                done(error.message, false)
+                done(error.message, false, { message: 'Incorrect password.' })
             }
         }
     )
@@ -49,7 +47,7 @@ passport.use(
             try {
                 const user = await UserModel.findById(payload.userId)
 
-                if (!user){
+                if (!user) {
                     done(null, false)
                 }
 
@@ -61,7 +59,9 @@ passport.use(
     )
 )
 
-passport.serializeUser((user: UserModelInterface, done) => {
+passport.serializeUser((user: any, done) => {
+    console.log(user);
+    
     done(null, user._id)
 })
 passport.deserializeUser((id, done) => {

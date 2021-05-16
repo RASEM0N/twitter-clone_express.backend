@@ -75,10 +75,13 @@ class UserController {
      * @access      Private (Middleware [Bearer token])
      */
     getMe = async (req: Request, res: Response): Promise<void> => {
+        const _id = (req.user as UserModelInterface)._id
+
         try {
             res.json({
                 status: 'success',
                 data: req.user,
+                token: createTokenByUserId(_id),
             })
         } catch (error) {
             res.status(500).json({
@@ -122,6 +125,7 @@ class UserController {
             res.json({
                 status: 'success',
                 data: user,
+                token: createTokenByUserId(user._id),
             })
         } catch (error) {
             res.status(500).json({
