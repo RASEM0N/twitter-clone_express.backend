@@ -1,6 +1,7 @@
 import * as express from 'express'
 import * as morgan from 'morgan'
 import * as dotenv from 'dotenv'
+import * as multer from 'multer'
 
 dotenv.config({ path: './.env.dev' })
 
@@ -10,10 +11,22 @@ import registerValidation from './validation/register'
 import tweetValidation from './validation/tweet'
 import connectDB from './core/db'
 import { passport } from './middleware/passport'
+import uploadFIleController from './controllers/UploadFIleController'
 
 connectDB()
 
 const app = express()
+const storage = multer.memoryStorage()
+// multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, __dirname + '/uploads')
+//     },
+//     filename: (req, file, cb) => {
+//         const ext = file.originalname.split('.').pop()
+//         cb(null, `image-${Date.now()}.${ext}`)
+//     },
+// })
+const upload = multer({ storage })
 
 // --- MIDDLEWARE ---
 app.use(morgan('dev'))
@@ -23,6 +36,12 @@ app.use(passport.initialize())
 // --- USER ROUTES --- //
 app.get('/users', userController.getAll)
 app.get('/users/:userId', userController.getById)
+app.post(
+    '/upload',
+    passport.authenticate('jwt'),
+    upload.single('avatar'),
+    uploadFIleController.upload
+)
 
 // --- AUTHORIZATION ROUTES ---
 app.get('/auth/me', passport.authenticate('jwt'), userController.getMe)
