@@ -16,6 +16,30 @@ class UploadFIleController {
                     if (error || !result) {
                         return res.status(500).json({ status: 'error', message: 'Error uploading' })
                     }
+                    res.status(201).json({
+                        status: 'success',
+                        data: {
+                            photoUrl: result.url,
+                        },
+                    })
+                }
+            )
+            .end(file.buffer)
+    }
+
+    uploadUserAvatar = async (req: Request, res: Response): Promise<void> => {
+        const userId = (req.user as UserModelInterface)._id
+        const file = req.file
+
+        await cloudinary.v2.uploader
+            .upload_stream(
+                {
+                    resouce_type: 'auto',
+                },
+                async (error, result) => {
+                    if (error || !result) {
+                        return res.status(500).json({ status: 'error', message: 'Error uploading' })
+                    }
 
                     await UserModel.findByIdAndUpdate(userId, {
                         avatarUrl: result.url,

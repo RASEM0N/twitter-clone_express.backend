@@ -37,10 +37,10 @@ app.use(passport.initialize())
 app.get('/users', userController.getAll)
 app.get('/users/:userId', userController.getById)
 app.post(
-    '/upload',
+    '/users/upload',
     passport.authenticate('jwt'),
     upload.single('avatar'),
-    uploadFIleController.upload
+    uploadFIleController.uploadUserAvatar
 )
 
 // --- AUTHORIZATION ROUTES ---
@@ -55,6 +55,12 @@ app.delete('/tweets/:tweetId', passport.authenticate('jwt'), tweetController.del
 app.put('/tweets/:tweetId', passport.authenticate('jwt'), tweetValidation, tweetController.update)
 app.get('/tweets', tweetController.getAll)
 app.get('/tweets/:tweetId', tweetController.getById)
+app.post(
+    '/upload',
+    passport.authenticate('jwt'),
+    upload.single('image'),
+    uploadFIleController.upload
+)
 
 // --- SETTINGS ---
 const PORT = process.env.PORT || 5000

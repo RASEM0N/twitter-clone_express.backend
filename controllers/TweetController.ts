@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import TweetModel from '../models/TweetModel'
+import TweetModel, { TweetModelInterface } from '../models/TweetModel'
 import { isValidObjectId } from 'mongoose'
 import { validationResult } from 'express-validator'
 import { UserModelInterface } from '../models/UserModel'
@@ -7,9 +7,7 @@ import { UserModelInterface } from '../models/UserModel'
 class TweetController {
     getAll = async (_: Request, res: Response): Promise<void> => {
         try {
-            const tweets = await TweetModel.find()
-                .populate('user')
-                .sort({ createdAt: '-1' })
+            const tweets = await TweetModel.find().populate('user').sort({ createdAt: '-1' })
             res.json({
                 status: 'success',
                 data: tweets,
@@ -25,8 +23,6 @@ class TweetController {
     getById = async (req: Request, res: Response): Promise<void> => {
         try {
             const tweetId = req.params.tweetId
-
-            console.log(tweetId)
 
             if (!isValidObjectId(tweetId)) {
                 res.json({
@@ -71,9 +67,10 @@ class TweetController {
 
             let { text } = req.body
 
-            const data = {
+            const data: TweetModelInterface = {
                 text: req.body.text,
-                user: req.user,
+                image: req.body.image,
+                user: req.user as UserModelInterface,
             }
 
             const tweet = await TweetModel.create(data)
